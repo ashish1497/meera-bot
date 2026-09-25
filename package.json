@@ -1,0 +1,31 @@
+{
+  "name": "meera-bot",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run",
+    "db:setup": "tsx scripts/setup-db.ts",
+    "webhook": "tsx scripts/set-webhook.ts",
+    "prebuild": "tsx scripts/gen-voice.ts",
+    "predev": "tsx scripts/gen-voice.ts",
+    "pretest": "tsx scripts/gen-voice.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^2.24.0",
+    "next": "^16.3.6",
+    "postgres": "^3.4.9",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "@types/react": "^19.3.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
+  },
+  "type": "module"
+}

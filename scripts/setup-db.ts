@@ -1,0 +1,10 @@
+import { readFileSync } from "node:fs";
+import postgres from "postgres";
+process.loadEnvFile(".env.local");
+const db = postgres(process.env.DATABASE_URL!, { prepare: false, ssl: "require", max: 1 });
+await db.unsafe(readFileSync("supabase/schema.sql", "utf8"));
+const voice = readFileSync("voice-skill.txt", "utf8");
+const existing = await db`select 1 from voice_skill where content = ${voice} limit 1`;
+if (existing.length === 0) await db`insert into voice_skill (content) values (${voice})`;
+console.log(await db`select table_name from information_schema.tables where table_schema='public' order by 1`);
+await db.end();
