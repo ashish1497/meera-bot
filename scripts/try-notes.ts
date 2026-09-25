@@ -16,5 +16,5 @@ for (const [i, note] of notes.entries()) {
   const { phrase, news } = await findNews(note);
   console.log("news phrase:", phrase, "| item:", news?.headline, "|", news?.source, news?.date);
   const d = await writeDraft(note, news);
-  console.log(`--- draft (${d.model}, usedNews=${d.usedNews}) ---\n${d.body}`);
+  console.log(`--- draft (${d.model}, ${d.plan.format}, ${d.plan.coreEmotion}, usedNews=${d.usedNews}) ---\nWOW: ${d.plan.wowFactor}\n${d.body}\nOTHER HOOKS: ${JSON.stringify(d.otherHooks)}\nLINT LEFT: ${JSON.stringify(d.lintLeft)}`);
 }

@@ -28,6 +28,8 @@ create table if not exists voice_skill (
   created_at timestamptz not null default now()
 );
 
+alter table drafts add column if not exists meta jsonb;
+
 alter table notes enable row level security;
 alter table drafts enable row level security;
 alter table voice_skill enable row level security;

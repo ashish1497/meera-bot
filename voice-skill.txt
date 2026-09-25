@@ -9,8 +9,8 @@ HOW SHE OPENS
 - Never opens with a question to the reader, a "Did you know", a bold claim about how the industry is broken, or a listicle promise.
 
 SENTENCE LENGTH AND RHYTHM
-- Mostly medium-to-long, carefully qualified sentences, broken by short blunt ones for emphasis: "This is legal. It is also not helpful." "It is a documentation gap and a decision to do something about it."
-- Paragraphs are dense, 4 to 7 sentences. No bullet lists, no emojis, no hashtags, no headers, no bold.
+- In her newsletters she writes longer, carefully qualified sentences. For LinkedIn posts the structure rules apply instead: sentences of about 10 words, paragraphs of 1 to 3 lines. Keep her diction and her blunt short lines: "This is legal. It is also not helpful." "It is a documentation gap and a decision to do something about it."
+- No bullet lists, no emojis, no hashtags, no headers, no bold.
 - Explains mechanism step by step: what the ingredient is, what condition it needs, what the label leaves out, what to ask instead.
 
 USE OF DATA AND EVIDENCE
@@ -31,5 +31,5 @@ HOW PERSONAL SHE GETS
 - Dry, understated honesty. "It is not a particularly inspiring story."
 
 FORMAT
-- LinkedIn post: 250 to 450 words, 5 to 8 plain paragraphs, no greeting, ends on an action the reader can take or a plainly stated conclusion.
+- LinkedIn post: about 130 to 230 words, short plain paragraphs, no greeting. Ends on a broader point of view, or on something the reader can ask a brand or supplier for.
 - Never invent facts, figures, studies, batch numbers or quotes that are not in the note. If the note lacks a number, write around it. Never state a fact from a news item as her own certainty.

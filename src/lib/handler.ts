@@ -50,14 +50,18 @@ export async function handleUpdate(update: TgUpdate): Promise<void> {
 
     const { news } = await findNews(text);
     const draft = await writeDraft(text, news);
+    const hooks = draft.otherHooks.length
+      ? `\n\nOther hooks to try:\n${draft.otherHooks.map((h, i) => `${i + 1}. ${h}`).join("\n")}`
+      : "";
     const tgId = await sendMessage(
       chatId,
-      `${draft.body}\n\n(Score ${score}/10. Reply APPROVE or REJECT to this message.)`,
+      `${draft.body}${hooks}\n\n(Score ${score}/10. Reply APPROVE or REJECT to this message.)`,
       msg.message_id
     );
+    const meta = { format: draft.plan.format, coreEmotion: draft.plan.coreEmotion, wowFactor: draft.plan.wowFactor, hooks: draft.plan.hooks, lintLeft: draft.lintLeft };
     await db`
-      insert into drafts (note_id, body, news, model, status, telegram_message_id)
-      values (${noteId}, ${draft.body}, ${draft.usedNews && news ? db.json(news as never) : null}, ${draft.model}, 'pending', ${tgId})`;
+      insert into drafts (note_id, body, news, model, status, telegram_message_id, meta)
+      values (${noteId}, ${draft.body}, ${draft.usedNews && news ? db.json(news as never) : null}, ${draft.model}, 'pending', ${tgId}, ${db.json(meta as never)})`;
     await db`update notes set outcome = 'drafted' where id = ${noteId}`;
   } catch (err) {
     console.error("[meera-bot] pipeline failed:", err);
