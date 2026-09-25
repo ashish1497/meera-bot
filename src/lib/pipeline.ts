@@ -87,7 +87,7 @@ Rules that cannot be broken:
 - Length: half a page to one page (about 130 to 230 words). Shorter and finished beats longer.
 - Ending: about 80% is her specific story. The final one or two lines turn it into a broader point of view that anyone in a wider group (not only skincare founders) could comment on. Never "What do you think?". Never a pitch.`;
 
-export async function planPost(note: string, news: NewsItem | null): Promise<Plan> {
+export async function planPost(note: string): Promise<Plan> {
   return geminiJson<Plan>(
     `${STRUCTURE_RULES}
 
@@ -103,7 +103,7 @@ NOTE:
 """
 ${note}
 """
-${news ? `\nNEWS ITEM available: ${news.headline} (${news.source}, ${news.date}).` : ""}`,
+`,
     {
       type: "object",
       properties: {
@@ -234,19 +234,22 @@ ${body}
   return issues;
 }
 
+export const TIME_BUDGET_MS = 110_000; // route maxDuration is 180s; leave room for Telegram sends and DB writes.
+
 export async function writeDraft(
   note: string,
   news: NewsItem | null,
+  plan: Plan,
+  startedAt: number = Date.now(),
   provider: "gemini" | "claude" = (process.env.DRAFT_PROVIDER as "gemini" | "claude") || "gemini"
 ): Promise<Draft> {
-  const plan = await planPost(note, news);
   const first = await generate(draftPrompt(note, news, plan), provider);
   let { body, usedNews } = splitDraft(first.text, news);
 
-  // Session 2 prompt 4: don't rewrite the whole thing, fix the specific problems. Two passes max.
-  for (let pass = 0; pass < 2; pass++) {
-    const issues = [...lintIssues(lintPost(body)), ...(await checkGrounding(note, body, news))];
-    if (issues.length === 0) break;
+  // Session 2 prompt 4: don't rewrite the whole thing, fix the specific problems. One pass, only if time allows.
+  const issues = [...lintIssues(lintPost(body)), ...(await checkGrounding(note, body, news).catch(() => []))];
+  let lintLeft = issues;
+  if (issues.length > 0 && Date.now() - startedAt < TIME_BUDGET_MS) {
     const fix = await generate(
       `${STRUCTURE_RULES}
 
@@ -261,6 +264,7 @@ ${body}
       provider
     );
     body = fix.text.replace(/\n?\s*USED_NEWS:\s*(yes|no)\s*$/i, "").trim();
+    lintLeft = lintIssues(lintPost(body));
   }
 
   const best = Math.max(0, Math.min(plan.hooks.length - 1, plan.bestHook));
@@ -270,7 +274,7 @@ ${body}
     model: first.model,
     plan,
     otherHooks: plan.hooks.filter((_, i) => i !== best).map((h) => h.text),
-    lintLeft: [...lintIssues(lintPost(body)), ...(await checkGrounding(note, body, news))],
+    lintLeft,
   };
 }
 

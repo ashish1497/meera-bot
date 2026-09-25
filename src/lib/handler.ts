@@ -1,7 +1,7 @@
 import { sql } from "@/lib/db";
 import { sendMessage } from "@/lib/telegram";
 import { parseDecision } from "@/lib/commands";
-import { SCORE_THRESHOLD, scoreNote, findNews, writeDraft } from "@/lib/pipeline";
+import { SCORE_THRESHOLD, scoreNote, findNews, planPost, writeDraft } from "@/lib/pipeline";
 
 export type TgMessage = {
   message_id: number;
@@ -39,7 +39,13 @@ export async function handleUpdate(update: TgUpdate): Promise<void> {
   if (inserted.length === 0) return; // Telegram retry of an update we already handled
   const noteId = inserted[0].id as number;
 
+  const startedAt = Date.now();
   try {
+    // Score, plan and news lookup are independent, so run them together. Plan and news are wasted if the note is scored out, which is cheap.
+    const planP = planPost(text);
+    const newsP = findNews(text);
+    planP.catch(() => {});
+    newsP.catch(() => {});
     const { score, reason } = await scoreNote(text);
     if (score < SCORE_THRESHOLD) {
       await db`update notes set score = ${score}, score_reason = ${reason}, outcome = 'scored_out' where id = ${noteId}`;
@@ -48,8 +54,8 @@ export async function handleUpdate(update: TgUpdate): Promise<void> {
     }
     await db`update notes set score = ${score}, score_reason = ${reason} where id = ${noteId}`;
 
-    const { news } = await findNews(text);
-    const draft = await writeDraft(text, news);
+    const [plan, { news }] = await Promise.all([planP, newsP]);
+    const draft = await writeDraft(text, news, plan, startedAt);
     const hooks = draft.otherHooks.length
       ? `\n\nOther hooks to try:\n${draft.otherHooks.map((h, i) => `${i + 1}. ${h}`).join("\n")}`
       : "";

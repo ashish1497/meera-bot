@@ -1,7 +1,7 @@
 import { after } from "next/server";
 import { handleUpdate, type TgUpdate } from "@/lib/handler";
 
-export const maxDuration = 60;
+export const maxDuration = 180;
 
 export async function POST(req: Request) {
   const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
